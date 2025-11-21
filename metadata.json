@@ -1,0 +1,8 @@
+{
+  "name": "ISAAC AI ",
+  "description": "An AI-powered terminal interface where a knowledgeable AI assistant, Isaac, responds to commands and questions with a confident, hacker-like persona via text or voice.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/vite.svg">
+    <title>AI Hacker Terminal</title>
+    <link rel="manifest" href="/manifest.json" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Share Tech Mono', monospace;
+        background-color: #000;
+        color: #00ff00;
+        text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
+        background-size: 50px 50px;
+        animation: grid-flicker 4s linear infinite;
+        opacity: 0.2;
+        z-index: -1;
+      }
+
+      /* App-like Selection Behavior */
+      #root {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      /* Allow selecting chat text */
+      .selectable-text {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+      input, textarea {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      @keyframes grid-flicker {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.1; }
+      }
+
+      #scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0) 0,
+          rgba(0, 0, 0, 0) 2px,
+          rgba(0, 255, 0, 0.1) 3px,
+          rgba(0, 0, 0, 0.1) 4px
+        );
+        z-index: 100;
+      }
+      #vignette {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%);
+        z-index: 99;
+      }
+
+      .glitch {
+        animation: glitch 1.5s linear infinite;
+      }
+      @keyframes glitch{
+        2%,64%{ transform: translate(2px,0) skew(0deg); }
+        4%,60%{ transform: translate(-2px,0) skew(0deg); }
+        62%{ transform: translate(0,0) skew(5deg); }
+      }
+      .glitch:before,
+      .glitch:after{
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .glitch:before{
+        left: 2px;
+        text-shadow: -2px 0 #ff00c1;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim 5s infinite linear alternate-reverse;
+      }
+      .glitch:after{
+        left: -2px;
+        text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+        clip: rect(85px, 450px, 90px, 0);
+        animation: glitch-anim2 5s infinite linear alternate-reverse;
+      }
+      @keyframes glitch-anim{
+        0% { clip: rect(42px, 9999px, 44px, 0); }
+        5% { clip: rect(17px, 9999px, 96px, 0); }
+        100% { clip: rect(50px, 9999px, 95px, 0); }
+      }
+      @keyframes glitch-anim2{
+        0% { clip: rect(42px, 9999px, 44px, 0); transform: skew(0.3deg); }
+        5% { clip: rect(17px, 9999px, 96px, 0); transform: skew(0.5deg); }
+        100% { clip: rect(50px, 9999px, 95px, 0); transform: skew(0.2deg); }
+      }
+       .blinking-cursor {
+        animation: blink 1s step-end infinite;
+        border-right: 0.5em solid #00ff00;
+        text-shadow: 0 0 5px #00ff00;
+      }
+      @keyframes blink {
+        from, to { border-right-color: transparent }
+        50% { border-right-color: #00ff00; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.1"
+  }
+}
+</script>
+</head>
+  <body class="bg-black text-green-400">
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
