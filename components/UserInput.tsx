@@ -271,14 +271,14 @@ const UserInput: React.FC<UserInputProps> = ({
             <div className="flex justify-between items-center mt-4 space-x-2">
               <button 
                 onClick={closeCamera}
-                className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors rounded font-bold text-sm md:text-base"
+                className="px-4 py-3 md:py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors rounded font-bold text-sm md:text-base flex-1"
               >
                 CANCEL
               </button>
               
                <button 
                 onClick={handleSwitchCamera}
-                className="px-4 py-2 border border-green-500 text-green-500 hover:bg-green-900 hover:text-white transition-colors rounded font-bold text-sm md:text-base flex items-center"
+                className="px-4 py-3 md:py-2 border border-green-500 text-green-500 hover:bg-green-900 hover:text-white transition-colors rounded font-bold text-sm md:text-base flex-1 flex justify-center items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -288,7 +288,7 @@ const UserInput: React.FC<UserInputProps> = ({
 
               <button 
                 onClick={handleTakePhoto}
-                className="px-6 py-2 bg-green-600 text-black hover:bg-green-400 transition-colors rounded font-bold animate-pulse text-sm md:text-base"
+                className="px-6 py-3 md:py-2 bg-green-600 text-black hover:bg-green-400 transition-colors rounded font-bold animate-pulse text-sm md:text-base flex-1"
               >
                 SNAP
               </button>
@@ -302,26 +302,26 @@ const UserInput: React.FC<UserInputProps> = ({
           <img src={imagePreviewUrl} alt="Preview" className="max-h-32 rounded-md" />
           <button 
             onClick={onRemoveImage}
-            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-500 transition-colors border border-black"
+            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-red-500 transition-colors border border-black"
             aria-label="Remove image"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       )}
       
-      <div className="flex items-end space-x-2">
+      <div className="flex items-end gap-2 flex-wrap md:flex-nowrap">
         <textarea
           ref={textareaRef}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={isListening ? 'Listening... (Camera active = Live Vision)' : isLoading ? 'Processing...' : 'Enter command...'}
+          placeholder={isListening ? 'Listening...' : isLoading ? 'Processing...' : 'Enter command...'}
           disabled={isLoading || isListening}
           rows={1}
-          className="flex-1 bg-gray-900 text-green-400 border border-green-700 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-green-700 disabled:opacity-50 max-h-32"
+          className="w-full md:flex-1 order-1 md:order-none bg-gray-900 text-green-400 border border-green-700 rounded-md p-3 md:p-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-green-700 disabled:opacity-50 max-h-32"
           style={{textShadow: 'none'}}
         />
         
@@ -333,77 +333,79 @@ const UserInput: React.FC<UserInputProps> = ({
             className="hidden"
         />
 
-        {/* Camera Button */}
-        <button
-          onClick={handleCameraClick}
-          disabled={isLoading}
-          className="bg-gray-800 text-green-400 font-bold p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900"
-          title="Take Photo / Live Vision"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
+        <div className="flex gap-2 order-2 md:order-none w-full md:w-auto justify-between md:justify-start">
+            {/* Camera Button */}
+            <button
+            onClick={handleCameraClick}
+            disabled={isLoading}
+            className="bg-gray-800 text-green-400 font-bold p-3 md:p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900 flex-1 md:flex-none flex justify-center"
+            title="Take Photo / Live Vision"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            </button>
 
-        {/* Screen Share Button */}
-        <button
-          onClick={handleScreenShareClick}
-          disabled={isLoading}
-          className="bg-gray-800 text-green-400 font-bold p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900"
-          title="Capture Screen"
-        >
-           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-           </svg>
-        </button>
+            {/* Screen Share Button (Hidden on small mobile usually, but kept for power users) */}
+            <button
+            onClick={handleScreenShareClick}
+            disabled={isLoading}
+            className="bg-gray-800 text-green-400 font-bold p-3 md:p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900 flex-1 md:flex-none hidden md:flex justify-center"
+            title="Capture Screen"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            </button>
 
-        {/* Upload Button */}
-        <button
-          onClick={handleFileClick}
-          disabled={isLoading}
-          className="bg-gray-800 text-green-400 font-bold p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900"
-          title="Upload Image"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-          </svg>
-        </button>
+            {/* Upload Button */}
+            <button
+            onClick={handleFileClick}
+            disabled={isLoading}
+            className="bg-gray-800 text-green-400 font-bold p-3 md:p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900 flex-1 md:flex-none flex justify-center"
+            title="Upload Image"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            </button>
 
-        {/* Mic Button */}
-        <button
-          onClick={onToggleListening}
-          disabled={isLoading && !isListening}
-          className={`font-bold p-2 rounded-md transition-colors duration-200 border ${isListening ? 'bg-red-600 border-red-400 hover:bg-red-500 text-white animate-pulse' : 'bg-green-700 border-green-500 hover:bg-green-500 text-black'} disabled:opacity-50`}
-          aria-label={isListening ? 'Stop listening' : 'Start listening'}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
-        </button>
-        
-        {/* Run Last Command Button */}
-        <button
-            onClick={handleRunLastCommand}
-            disabled={isLoading || commandHistory.length === 0 || isListening}
-            className="bg-gray-800 text-green-400 font-bold p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900"
-            title="Run last command"
-          >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 11l7-7 7 7M5 19l7-7 7 7" />
-          </svg>
-        </button>
+            {/* Mic Button */}
+            <button
+            onClick={onToggleListening}
+            disabled={isLoading && !isListening}
+            className={`font-bold p-3 md:p-2 rounded-md transition-colors duration-200 border ${isListening ? 'bg-red-600 border-red-400 hover:bg-red-500 text-white animate-pulse' : 'bg-green-700 border-green-500 hover:bg-green-500 text-black'} disabled:opacity-50 flex-1 md:flex-none flex justify-center`}
+            aria-label={isListening ? 'Stop listening' : 'Start listening'}
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            </button>
+            
+            {/* Run Last Command Button */}
+            <button
+                onClick={handleRunLastCommand}
+                disabled={isLoading || commandHistory.length === 0 || isListening}
+                className="bg-gray-800 text-green-400 font-bold p-3 md:p-2 rounded-md hover:bg-gray-700 disabled:opacity-50 border border-green-900 flex-1 md:flex-none flex justify-center"
+                title="Run last command"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 11l7-7 7 7M5 19l7-7 7 7" />
+            </svg>
+            </button>
 
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading || (!value.trim() && !imagePreviewUrl) || isListening}
-          className="bg-green-700 text-black font-bold p-2 rounded-md hover:bg-green-500 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:text-gray-400 transition-colors duration-200 border border-green-500"
-          aria-label="Send command"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 10h6m-3-3l3 3-3 3" />
-          </svg>
-        </button>
+            <button
+            onClick={handleSubmit}
+            disabled={isLoading || (!value.trim() && !imagePreviewUrl) || isListening}
+            className="bg-green-700 text-black font-bold p-3 md:p-2 rounded-md hover:bg-green-500 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:text-gray-400 transition-colors duration-200 border border-green-500 flex-1 md:flex-none flex justify-center"
+            aria-label="Send command"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 10h6m-3-3l3 3-3 3" />
+            </svg>
+            </button>
+        </div>
       </div>
     </div>
   );

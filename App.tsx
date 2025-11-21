@@ -5,7 +5,7 @@ import UserInput from './components/UserInput';
 import ChatHistory from './components/ChatHistory';
 import { setTimestamp } from './db';
 
-const SYSTEM_INSTRUCTION = "You are Isaac, a helpful, knowledgeable, and friendly AI assistant running inside a Progressive Web App (PWA). You engage in natural, polite, and detailed conversation, similar to ChatGPT. You are fluent in all languages and must respond in the same language used by the user. When provided with an image, identify the object or subject, explain what it is, and provide details on its utility, usage, and when it is typically used. Use markdown to format your responses clearly. If asked about installing or downloading the app, explain that this is a web application that can be installed to the home screen via the browser menu (Add to Home Screen).";
+const SYSTEM_INSTRUCTION = "You are Isaac, a helpful, knowledgeable, and friendly AI assistant running inside a Progressive Web App (PWA). You are optimized for mobile phones and desktop terminals. You engage in natural, polite, and detailed conversation. You are fluent in all languages. When provided with an image, identify the object or subject, explain what it is, and provide details on its utility, usage, and when it is typically used. Use markdown to format your responses clearly. If asked about installing the app, guide the user to click the 'INSTALL' button in the header.";
 
 // --- Audio Utility Functions ---
 function decode(base64: string) {
@@ -58,6 +58,40 @@ function createBlob(data: Float32Array): GenAIBlob {
     };
 }
 
+// --- Install Help Modal Component ---
+const InstallHelpModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 p-4 backdrop-blur-sm">
+    <div className="border-2 border-green-500 bg-gray-900 p-6 rounded-lg max-w-md w-full shadow-[0_0_30px_rgba(0,255,0,0.2)] animate-in fade-in zoom-in duration-200">
+      <h2 className="text-xl font-bold text-green-400 mb-4 border-b border-green-700 pb-2 flex justify-between items-center">
+        <span>INSTALLATION GUIDE</span>
+        <button onClick={onClose} className="text-green-600 hover:text-green-400">✕</button>
+      </h2>
+      <div className="space-y-4 text-green-300 text-sm">
+        <div className="p-3 bg-black bg-opacity-50 rounded border border-green-800">
+          <h3 className="font-bold text-white mb-1 flex items-center gap-2">
+            <span className="text-lg">🤖</span> Android (Chrome)
+          </h3>
+          <p>1. Tap the <span className="font-bold text-white">Three Dots Menu</span> (top right).</p>
+          <p>2. Select <span className="font-bold text-white">Install App</span> or <span className="font-bold text-white">Add to Home Screen</span>.</p>
+        </div>
+        <div className="p-3 bg-black bg-opacity-50 rounded border border-green-800">
+          <h3 className="font-bold text-white mb-1 flex items-center gap-2">
+            <span className="text-lg">🍎</span> iOS (Safari)
+          </h3>
+          <p>1. Tap the <span className="font-bold text-white">Share Button</span> <span className="inline-block border border-current px-1 rounded text-xs">⎋</span> at the bottom.</p>
+          <p>2. Scroll down and tap <span className="font-bold text-white">Add to Home Screen</span> <span className="inline-block border border-current px-1 rounded text-xs">+</span>.</p>
+        </div>
+      </div>
+      <button 
+        onClick={onClose}
+        className="mt-6 w-full bg-green-700 hover:bg-green-600 text-black font-bold py-3 rounded transition-colors shadow-lg shadow-green-900/20"
+      >
+        UNDERSTOOD
+      </button>
+    </div>
+  </div>
+);
+
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -67,6 +101,8 @@ const App: React.FC = () => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [image, setImage] = useState<{ data: string; mimeType: string; previewUrl: string } | null>(null);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
 
   const chatRef = useRef<Chat | null>(null);
   const liveSessionRef = useRef<any>(null);
@@ -101,6 +137,14 @@ const App: React.FC = () => {
     };
     window.addEventListener('beforeinstallprompt', handleInstallPrompt);
 
+    // Check Standalone Mode
+    const checkStandalone = () => {
+      const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+      setIsStandalone(isStandaloneMode);
+    };
+    checkStandalone();
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', checkStandalone);
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -109,18 +153,22 @@ const App: React.FC = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setInstallPrompt(null);
+    if (installPrompt) {
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setInstallPrompt(null);
+      }
+    } else {
+      // If no prompt available (e.g. iOS or already installed but undetected), show help
+      setShowInstallHelp(true);
     }
   };
 
   useEffect(() => {
     // Startup sequence
     const startupSequence = [
-      { delay: 500, text: 'BOOTING ISAAC v2.5...' },
+      { delay: 500, text: 'BOOTING ISAAC v3.1 MOBILE...' },
       { delay: 1000, text: 'ACCESSING NEURAL CORE... [OK]' },
       { delay: 1200, text: 'CALIBRATING LOGIC MATRIX... [OK]' },
       { delay: 1500, text: 'LOADING DIRECTIVES... [OK]' },
@@ -238,19 +286,15 @@ const App: React.FC = () => {
       }
       
       // Client-side help for installation
-      if (lowerCaseMessage.includes('how to download') || lowerCaseMessage.includes('install app') || lowerCaseMessage === 'download') {
-          const installText = `[ISAAC] INSTALLATION PROTOCOL:\n\nThis application is a Progressive Web App (PWA). You can install it directly from your browser.\n\n**Desktop (Chrome/Edge):**\nClick the Install icon in the address bar or the [ INSTALL TERMINAL ] button at the top of this screen.\n\n**Android (Chrome):**\nTap the browser menu (⋮) -> "Install App" or "Add to Home Screen".\n\n**iOS (Safari):**\nTap the "Share" button (box with arrow) -> Scroll down -> "Add to Home Screen".`;
+      if (lowerCaseMessage.includes('how to download') || lowerCaseMessage.includes('install') || lowerCaseMessage === 'download') {
+          const installText = `[ISAAC] To install this app on your device, tap the 'INSTALL' button in the top-left header.\n\nIf you don't see it:\n- **Android:** Tap the 3 dots menu -> Install App.\n- **iOS:** Tap Share -> Add to Home Screen.`;
           setMessages(prev => [...prev, { role: 'model', content: installText }]);
-          
-          // Try to prompt if available
-          if (installPrompt) {
-             handleInstallClick();
-          }
+          handleInstallClick();
           return;
       }
 
       if (lowerCaseMessage === 'help') {
-          const helpText = `[ISAAC] HELP PROTOCOL:\n\n- Type any command or question to interact with ISAAC.\n- Use the microphone button for voice commands.\n- Use the attachment button to upload an image.\n- Type 'install app' for download instructions.\n- Use Up/Down arrows to navigate command history.\n\nCLIENT COMMANDS:\n- 'clear' : Clears the terminal screen.\n- 'help'  : Displays this help message.`;
+          const helpText = `[ISAAC] HELP PROTOCOL:\n\n- Type any command or question to interact with ISAAC.\n- Use the microphone button for voice commands.\n- Use the attachment button to upload an image.\n- Type 'install' for download instructions.\n- Use Up/Down arrows to navigate command history.`;
           setMessages(prev => [...prev, { role: 'model', content: helpText }]);
           return;
       }
@@ -275,7 +319,6 @@ const App: React.FC = () => {
         messageParts.push({ text: textPrompt });
       }
 
-      // Wrap messageParts in an object with 'message' key
       const result = await chatRef.current.sendMessageStream({ message: messageParts });
       let text = '';
       setMessages(prev => [...prev, { role: 'model', content: '' }]);
@@ -370,15 +413,13 @@ const App: React.FC = () => {
                 const text = message.serverContent.inputTranscription.text;
                 currentInputTranscriptionRef.current += text;
                 setMessages(prev => {
-                    // find last user message and update, or add a new one
                     const lastMsgIndex = prev.map(m => m.role).lastIndexOf('user');
                     const lastModelMsgIndex = prev.map(m => m.role).lastIndexOf('model');
-
-                    if(lastMsgIndex > lastModelMsgIndex) { // Update existing user message
+                    if(lastMsgIndex > lastModelMsgIndex) {
                         const newMessages = [...prev];
                         newMessages[lastMsgIndex] = { role: 'user', content: currentInputTranscriptionRef.current };
                         return newMessages;
-                    } else { // Add new user message
+                    } else {
                          return [...prev, {role: 'user', content: currentInputTranscriptionRef.current}]
                     }
                 });
@@ -434,7 +475,6 @@ const App: React.FC = () => {
             stopListening();
           },
           onclose: () => {
-            // Check if listening was intended to be on, to avoid duplicate messages on manual stop
             if (isListening) {
               setMessages(prev => [...prev, { role: 'model', content: 'VOICE CHANNEL CLOSED.' }]);
               stopListening();
@@ -478,26 +518,32 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-dvh bg-black bg-opacity-95 font-mono text-green-400">
-      <header className="p-4 border-b border-green-900 text-center flex justify-between items-center select-none">
-        <div className="w-1/3 text-left">
-           {installPrompt && (
+      {showInstallHelp && <InstallHelpModal onClose={() => setShowInstallHelp(false)} />}
+      
+      <header className="p-3 md:p-4 border-b border-green-900 text-center flex justify-between items-center select-none relative z-10">
+        <div className="w-1/4 text-left">
+           {!isStandalone && (
             <button 
               onClick={handleInstallClick}
-              className="text-xs md:text-sm border border-green-700 px-2 py-1 rounded hover:bg-green-900 hover:text-white transition-colors animate-pulse"
+              className={`flex items-center gap-2 text-xs md:text-sm border border-green-700 px-3 py-1 rounded hover:bg-green-900 hover:text-white transition-all group ${installPrompt ? 'animate-pulse bg-green-900 bg-opacity-40 border-green-400 text-green-300' : 'text-green-600'}`}
+              title="Download / Install App"
             >
-              [ INSTALL TERMINAL ]
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${installPrompt ? 'animate-bounce' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12" />
+              </svg>
+              <span className="font-bold">INSTALL</span>
             </button>
            )}
         </div>
-        <h1 className="text-xl md:text-3xl font-bold text-green-400 relative glitch w-1/3 text-center" data-text="[ ISAAC ]">[ ISAAC ]</h1>
-        <div className="w-1/3 text-right">
-            {isOffline && <span className="text-red-500 font-bold animate-pulse text-sm md:text-base">[OFFLINE]</span>}
+        <h1 className="text-xl md:text-3xl font-bold text-green-400 relative glitch w-2/4 text-center" data-text="[ ISAAC ]">[ ISAAC ]</h1>
+        <div className="w-1/4 text-right">
+            {isOffline && <span className="text-red-500 font-bold animate-pulse text-xs md:text-base">[OFFLINE]</span>}
         </div>
       </header>
       <main className="flex-1 overflow-y-auto p-4">
         <ChatHistory messages={messages} isLoading={isLoading} />
       </main>
-      <footer className="p-4 border-t border-green-900">
+      <footer className="p-2 md:p-4 border-t border-green-900 bg-black pb-safe">
         <UserInput 
           onSend={handleSend} 
           isLoading={isLoading} 

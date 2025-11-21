@@ -1,12 +1,14 @@
-
 {
   "name": "ISAAC AI Hacker Terminal",
   "short_name": "ISAAC",
+  "id": "/?source=pwa",
   "description": "An AI-powered terminal interface where a knowledgeable AI assistant, Isaac, responds to commands and questions with a confident, hacker-like persona via text or voice.",
+  "categories": ["productivity", "utilities", "ai"],
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "orientation": "any",
   "icons": [
     {
       "src": "/vite.svg",

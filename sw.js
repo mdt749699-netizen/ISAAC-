@@ -1,5 +1,4 @@
-
-const CACHE_NAME = 'isaac-terminal-cache-v3';
+const CACHE_NAME = 'isaac-terminal-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
